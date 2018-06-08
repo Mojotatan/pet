@@ -1,9 +1,17 @@
-import {SimpleScene} from './scenes/simple-scene'
+import test from './scenes/test'
+import platforming from './scenes/platforming'
 
-const gameConfig = {
-  width: 680,
-  height: 400,
-  scene: SimpleScene
+// going for 5/8 ratio
+const config = {
+  width: 1200,
+  height: 750,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: {y: 1000}
+    }
+  },
+  scene: platforming
 }
 
-new Phaser.Game(gameConfig)
+let game = new Phaser.Game(config)
