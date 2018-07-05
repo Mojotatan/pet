@@ -18,6 +18,8 @@ app
     res.sendStatus(200)
   })
 
+  .use('/api', require('./api'))
+
   .get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, './public/index.html'))
   })

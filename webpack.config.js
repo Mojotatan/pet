@@ -23,6 +23,11 @@ module.exports = {
     ]
   },
 
+  // workaround for fs breaking in webpack
+  // node: {
+  //   fs: 'empty'
+  // },
+
   plugins: [
     new webpack.DefinePlugin({
       'typeof CANVAS_RENDERER': JSON.stringify(true),

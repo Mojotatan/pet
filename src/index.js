@@ -1,6 +1,8 @@
 import test from './scenes/test'
 import platforming from './scenes/platforming'
 
+import {maps} from './map.js'
+
 // going for 5/8 ratio
 const config = {
   width: 1200,
