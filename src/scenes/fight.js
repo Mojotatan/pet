@@ -20,7 +20,6 @@ export default class SimpleScene extends Phaser.Scene {
     this.add.image(600, 375, 'mountains')
 
     projectiles = this.physics.add.group()
-    projectiles.maxSize = 1
 
     platforms = this.physics.add.staticGroup()
 
@@ -31,9 +30,10 @@ export default class SimpleScene extends Phaser.Scene {
     platforms.create(84, 500, 'dirt').setScale(2).refreshBody()
     platforms.create(600, 350, 'dirt').setScale(2).refreshBody()
 
-    player = this.physics.add.sprite(20, h - 74, 'blackmage').setScale(2)
+    player = this.physics.add.sprite(20, h - 74, 'blackmage').setScale(-2, 2)
     player.setCollideWorldBounds(true)
     player.face = 1
+    player.cooldowns = {hadouken: 0}
 
     this.anims.create({
       key: 'walk',
@@ -48,42 +48,49 @@ export default class SimpleScene extends Phaser.Scene {
       repeat: -1
     })
 
-    enemy = this.physics.add.sprite(w - (130/2), h - (165/2 + 42), 'marty')
+    enemy = this.physics.add.sprite(w - (130/2), h - (166/2 + 42), 'marty')
+    enemy.setCollideWorldBounds(true)
     enemy.health = 100
 
-    console.log(this)
-
+    
     this.physics.add.collider(player, platforms)
     this.physics.add.collider(projectiles, platforms, (projectile, platform) => {
       projectile.destroy()
     })
-    this.physics.add.collider(projectiles, enemy, (projectile, enemy) => {
-      enemy.health -= 20
-      projectile.destroy()
+    this.physics.add.collider(enemy, platforms)
+    this.physics.add.collider(projectiles, enemy, (a, b) => {
+      a.setVelocityX(0)
+      a.health -= 20
+      b.destroy()
     })
-
-
-
-
-
+    
+    
     cursors = this.input.keyboard.createCursorKeys()
+    
+    console.log(this)
+    console.log(player)
   }
-
+  
   update() {
+    player.cooldowns.hadouken--
+    if (enemy.health <= 0) enemy.destroy()
+
     if (projectiles.children.size > 0) {
-      if (projectiles.children.entries[0].x > 1200 || projectiles.children.entries[0].x < 0) {
-        projectiles.children.entries[0].destroy()
-      }
+      projectiles.children.entries.forEach(missile => {
+        if (missile.x > 1200 || missile.x < 0) missile.destroy()
+      })
     }
 
     if (cursors.left.isDown) {
       player.setVelocityX(-160)
       player.face = -1
+      player.setScale(2, 2)
       player.anims.play('walk', true)
     }
     else if (cursors.right.isDown) {
       player.setVelocityX(160)
       player.face = 1
+      player.setScale(-2, 2)
       player.anims.play('walk', true)
     }
     else {
@@ -97,10 +104,11 @@ export default class SimpleScene extends Phaser.Scene {
 
     if (cursors.space.isDown) {
       // console.log(player)
-      let missile = projectiles.create(player.x, player.y, 'phil')
-      if (missile) {
+      if (player.cooldowns.hadouken <= 0) {
+        let missile = projectiles.create(player.x, player.y, 'phil')
         missile.setVelocityX(1000 * player.face)
         missile.setGravityY(-300)
+        player.cooldowns.hadouken = 12
       }
     }
   }
